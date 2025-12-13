@@ -1,0 +1,425 @@
+erDiagram
+    PATIENT ||--o{ ADMISSION : has
+    PATIENT ||--o{ MEDICATION : takes
+    PATIENT ||--o{ ALLERGY : has
+    PATIENT ||--o{ PROBLEM : has
+    PATIENT ||--o{ SOCIAL_HISTORY : contains
+    
+    ADMISSION ||--o{ VITAL_SIGNS : records
+    ADMISSION ||--o{ LAB_RESULT : includes
+    ADMISSION ||--o{ PROCEDURE : includes
+    ADMISSION ||--o{ PROVIDER_NOTE : documents
+    ADMISSION ||--o{ DISCHARGE_SUMMARY : ends_with
+    ADMISSION ||--o{ PREDICTION_SCORE : generates
+    ADMISSION ||--o{ ALERT : triggers
+    
+    PREDICTION_SCORE }o--|| PREDICTION_MODEL : uses
+    ALERT ||--o{ ALERT_ACKNOWLEDGMENT : has
+    
+    PROVIDER_NOTE ||--o{ CLINICAL_ENTITY : extracts
+    DISCHARGE_SUMMARY ||--o{ READMISSION_EVENT : links_to
+    
+    MEDICATION ||--o{ DRUG_INTERACTION : contains
+    MEDICATION ||--o{ CONTRAINDICATION : has
+    
+    PROCEDURE ||--o{ CPT_CODE : coded_as
+    PROBLEM ||--o{ ICD10_CODE : coded_as
+    LAB_RESULT ||--o{ LOINC_CODE : coded_as
+    
+    ORGANIZATION ||--o{ DEPARTMENT : has
+    DEPARTMENT ||--o{ UNIT : has
+    UNIT ||--o{ BED : contains
+    BED ||--o{ BED_ASSIGNMENT : has
+    BED_ASSIGNMENT ||--o{ ADMISSION : assigns
+    
+    PROVIDER ||--o{ ADMISSION : attends
+    PROVIDER ||--o{ PROVIDER_NOTE : writes
+    PROVIDER ||--o{ ALERT_ACKNOWLEDGMENT : acknowledges
+    
+    ORGANIZATION ||--o{ USER : employs
+    USER ||--o{ USER_ROLE : has
+    USER_ROLE ||--o{ PERMISSION : grants
+    USER ||--o{ AUDIT_LOG : generates
+    
+    PREDICTION_MODEL ||--o{ MODEL_VERSION : has
+    MODEL_VERSION ||--o{ MODEL_PERFORMANCE : tracks
+    
+    COHORT ||--o{ PATIENT : contains
+    COHORT ||--o{ COHORT_DEFINITION : defined_by
+    
+    DASHBOARD ||--o{ DASHBOARD_WIDGET : contains
+    DASHBOARD_WIDGET ||--o{ METRIC : displays
+    
+    RECOMMENDATION ||--o{ CLINICAL_GUIDELINE : references
+    RECOMMENDATION ||--o{ ADMISSION : targets
+    
+    PATIENT {
+        string patient_id PK
+        string first_name
+        string last_name
+        date date_of_birth
+        string gender
+        string mrn
+        string ssn_encrypted
+        datetime created_at
+        datetime updated_at
+    }
+    
+    ADMISSION {
+        string admission_id PK
+        string patient_id FK
+        datetime admission_datetime
+        datetime discharge_datetime
+        string discharge_status
+        string admitting_diagnosis
+        string primary_diagnosis
+        string hospital_id FK
+        string department_id FK
+        string attending_provider_id FK
+        decimal length_of_stay_days
+        datetime created_at
+    }
+    
+    VITAL_SIGNS {
+        string vital_id PK
+        string admission_id FK
+        datetime measurement_datetime
+        decimal temperature_fahrenheit
+        integer heart_rate_bpm
+        integer systolic_bp_mmhg
+        integer diastolic_bp_mmhg
+        integer respiratory_rate_bpm
+        decimal oxygen_saturation_percent
+    }
+    
+    LAB_RESULT {
+        string lab_id PK
+        string admission_id FK
+        datetime result_datetime
+        string test_name
+        string loinc_code_id FK
+        decimal result_value
+        string result_unit
+        string reference_range
+        string abnormal_flag
+    }
+    
+    PROCEDURE {
+        string procedure_id PK
+        string admission_id FK
+        datetime procedure_datetime
+        string procedure_name
+        string cpt_code_id FK
+        string surgeon_id FK
+        string status
+    }
+    
+    MEDICATION {
+        string medication_id PK
+        string admission_id FK
+        string patient_id FK
+        datetime start_datetime
+        datetime end_datetime
+        string drug_name
+        string ndc_code
+        decimal dose
+        string dose_unit
+        string frequency
+        string route
+    }
+    
+    ALLERGY {
+        string allergy_id PK
+        string patient_id FK
+        string allergen_name
+        string reaction_type
+        string severity
+        string status
+    }
+    
+    PROBLEM {
+        string problem_id PK
+        string patient_id FK
+        string condition_name
+        string icd10_code_id FK
+        datetime onset_date
+        string status
+    }
+    
+    PROVIDER_NOTE {
+        string note_id PK
+        string admission_id FK
+        string provider_id FK
+        datetime note_datetime
+        string note_type
+        string note_text
+        string status
+    }
+    
+    CLINICAL_ENTITY {
+        string entity_id PK
+        string note_id FK
+        string entity_type
+        string entity_value
+        integer start_offset
+        integer end_offset
+        decimal confidence_score
+    }
+    
+    PREDICTION_SCORE {
+        string score_id PK
+        string admission_id FK
+        string model_version_id FK
+        datetime prediction_datetime
+        string prediction_type
+        decimal risk_score_0_to_100
+        string risk_category
+        string top_contributing_factor_1
+        string top_contributing_factor_2
+        string top_contributing_factor_3
+    }
+    
+    PREDICTION_MODEL {
+        string model_id PK
+        string model_name
+        string model_type
+        string description
+        datetime created_date
+        string status
+    }
+    
+    MODEL_VERSION {
+        string version_id PK
+        string model_id FK
+        string version_number
+        datetime deployment_date
+        decimal accuracy_percent
+        decimal sensitivity_percent
+        decimal specificity_percent
+        string status
+    }
+    
+    ALERT {
+        string alert_id PK
+        string admission_id FK
+        string alert_type
+        datetime alert_datetime
+        string severity
+        string status
+        string target_role
+        datetime due_datetime
+    }
+    
+    ALERT_ACKNOWLEDGMENT {
+        string ack_id PK
+        string alert_id FK
+        string user_id FK
+        datetime acknowledged_datetime
+        string action_taken
+    }
+    
+    RECOMMENDATION {
+        string rec_id PK
+        string admission_id FK
+        string recommendation_type
+        string recommendation_text
+        string clinical_guideline_id FK
+        string status
+        datetime created_at
+    }
+    
+    CLINICAL_GUIDELINE {
+        string guideline_id PK
+        string guideline_name
+        string source
+        string url
+        datetime last_updated
+    }
+    
+    DISCHARGE_SUMMARY {
+        string discharge_summary_id PK
+        string admission_id FK
+        datetime discharge_datetime
+        string summary_text
+        string medications_at_discharge
+        string follow_up_instructions
+    }
+    
+    READMISSION_EVENT {
+        string readmission_id PK
+        string discharge_summary_id FK
+        string admission_id FK
+        datetime readmission_datetime
+        integer days_to_readmission
+        string readmission_diagnosis
+    }
+    
+    ORGANIZATION {
+        string org_id PK
+        string org_name
+        string npi_number
+        string state
+        integer bed_count
+    }
+    
+    DEPARTMENT {
+        string department_id PK
+        string org_id FK
+        string department_name
+        string type
+    }
+    
+    UNIT {
+        string unit_id PK
+        string department_id FK
+        string unit_name
+        string unit_type
+        integer bed_count
+    }
+    
+    BED {
+        string bed_id PK
+        string unit_id FK
+        string bed_number
+        string status
+    }
+    
+    BED_ASSIGNMENT {
+        string assignment_id PK
+        string bed_id FK
+        string admission_id FK
+        datetime assignment_datetime
+        datetime discharge_datetime
+    }
+    
+    PROVIDER {
+        string provider_id PK
+        string first_name
+        string last_name
+        string npi_number
+        string specialty
+        string organization_id FK
+    }
+    
+    USER {
+        string user_id PK
+        string email
+        string first_name
+        string last_name
+        string organization_id FK
+        datetime last_login
+        boolean active
+    }
+    
+    USER_ROLE {
+        string role_id PK
+        string user_id FK
+        string role_name
+        datetime assigned_date
+    }
+    
+    PERMISSION {
+        string permission_id PK
+        string role_id FK
+        string resource
+        string action
+    }
+    
+    AUDIT_LOG {
+        string log_id PK
+        string user_id FK
+        string action
+        string resource_type
+        string resource_id
+        datetime timestamp
+        string ip_address
+        string details
+    }
+    
+    COHORT {
+        string cohort_id PK
+        string cohort_name
+        string created_by_user_id FK
+        datetime created_date
+        datetime modified_date
+        string status
+    }
+    
+    COHORT_DEFINITION {
+        string definition_id PK
+        string cohort_id FK
+        string filter_criteria
+        string filter_value
+        string operator
+    }
+    
+    DASHBOARD {
+        string dashboard_id PK
+        string dashboard_name
+        string owner_user_id FK
+        string dashboard_type
+        datetime created_date
+        string status
+    }
+    
+    DASHBOARD_WIDGET {
+        string widget_id PK
+        string dashboard_id FK
+        string widget_type
+        string metric_id FK
+        string position
+    }
+    
+    METRIC {
+        string metric_id PK
+        string metric_name
+        string calculation_type
+        string sql_query
+        string refresh_frequency
+    }
+    
+    SOCIAL_HISTORY {
+        string history_id PK
+        string patient_id FK
+        string smoking_status
+        string alcohol_use
+        string drug_use
+        string housing_status
+        string employment_status
+    }
+    
+    ICD10_CODE {
+        string code_id PK
+        string icd10_code
+        string description
+    }
+    
+    LOINC_CODE {
+        string code_id PK
+        string loinc_code
+        string test_name
+        string description
+    }
+    
+    CPT_CODE {
+        string code_id PK
+        string cpt_code
+        string procedure_name
+        string description
+    }
+    
+    DRUG_INTERACTION {
+        string interaction_id PK
+        string medication_id FK
+        string interacting_drug
+        string severity
+        string description
+    }
+    
+    CONTRAINDICATION {
+        string contraindication_id PK
+        string medication_id FK
+        string condition
+        string severity
+        string description
+    }
