@@ -3,7 +3,7 @@ from .Patient_Model import PatientModel
 
 class AllergyModel(models.Model):
     allergy_id = models.CharField(primary_key=True, max_length=255)
-    patient_id = models.ForeignKey(PatientModel, on_delete=models.SET_NULL)
+    patient_id = models.ForeignKey(PatientModel, on_delete=models.CASCADE)
     allergen_name = models.CharField(max_length=30)
     reaction_type = models.CharField(max_length=30)
     severity = models.CharField(max_length=30)

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, AbstractUser
-from organizations.models import OrganizationModel
+from apps.organizations.models.Organization_Model import OrganizationModel
 
 class UserModel(models.Model):
     user_id = models.CharField(primary_key=True)

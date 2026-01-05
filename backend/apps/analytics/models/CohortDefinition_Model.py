@@ -3,7 +3,7 @@ from .Cohort_model import CohortModel
 
 class CohortDefinitionModel(models.Model):
     definition_id = models.CharField(primary_key=True, max_length=255)
-    cohort_id = models.ForeignKey(CohortModel, on_delete=models.SET_NULL)
+    cohort_id = models.ForeignKey(CohortModel, on_delete=models.CASCADE)
     filter_criteria = models.CharField(max_length=100)
     filter_value = models.CharField(max_length=100)
     operator = models.CharField(max_length=100)
