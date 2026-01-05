@@ -11,3 +11,4 @@ class CohortModel(models.Model):
     
     def __str__(self):
         return f'{self.cohort_name} created by {self.created_by_user_id}'
+    
